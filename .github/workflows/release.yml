@@ -1,0 +1,41 @@
+# Publishes the NuGet package `Crafvy` when a version tag (v1.2.3) is pushed —
+# the tag pnpm sdk:sync-public sets.
+#
+# Trusted Publishing, no stored API key: GitHub proves to nuget.org that this
+# is Crafvy/crafvy-dotnet's release.yml (OIDC), and NuGet/login exchanges that
+# for an API key valid for one hour. One-time setup:
+#   - nuget.org → your account → Trusted Publishing: owner Crafvy, repository
+#     crafvy-dotnet, workflow release.yml, package `Crafvy`
+#   - this repository → Settings → Secrets and variables → Actions →
+#     Variables: NUGET_USER = the nuget.org user name (the profile name,
+#     not the e-mail address) that created that policy
+name: Release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Trusted Publishing exchanges
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: The tag is the package's version
+        run: test "v$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Crafvy/Crafvy.csproj)" = "$GITHUB_REF_NAME"
+      - name: Tests (the shared conformance suite)
+        run: dotnet test tests/Crafvy.Tests -c Release
+      - name: Pack
+        run: dotnet pack src/Crafvy -c Release -o out
+      - name: Sign in to nuget.org (Trusted Publishing)
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish to nuget.org
+        run: dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}

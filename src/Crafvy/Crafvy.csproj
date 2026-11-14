@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Crafvy</RootNamespace>
+    <AssemblyName>Crafvy</AssemblyName>
+
+    <PackageId>Crafvy</PackageId>
+    <Version>0.3.0</Version>
+    <Authors>Crafvy</Authors>
+    <Company>Crafvy</Company>
+    <Product>Crafvy .NET SDK</Product>
+    <Description>The official .NET client of the Crafvy API, generated from the API's description.</Description>
+    <PackageTags>crafvy;api;sdk;client</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://docs.crafvy.com/sdk</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Crafvy/crafvy-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- the generated models carry their docs where the API describes them -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- a version without "+<commit>": it is what User-Agent says -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <InternalsVisibleTo Include="Crafvy.Tests" />
+  </ItemGroup>
+
+  <!-- .NET 8 has System.Text.Json built in; .NET Standard 2.0 (.NET Framework 4.6.2+) gets the package -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+</Project>
