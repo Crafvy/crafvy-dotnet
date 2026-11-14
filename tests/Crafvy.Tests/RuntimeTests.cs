@@ -36,7 +36,9 @@ public class RuntimeTests
         var p = await Client(rec).Projects.GetAsync("a b/c");
         Assert.StartsWith("/api/projects/a%20b%2Fc", rec.Last.Request.RequestUri!.AbsolutePath);
         Assert.Equal("crafvy-dotnet/" + CrafvyClient.Version, rec.Last.Request.Headers.UserAgent.ToString());
-        Assert.Equal("0.2.0", CrafvyClient.Version);
+        // the package's own version, without the build's "+<commit>" suffix — not a
+        // literal, or every release would fail its own tests
+        Assert.Matches(@"^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$", CrafvyClient.Version);
         Assert.Equal("Bearer pb_test", rec.Last.Request.Headers.Authorization!.ToString());
         Assert.Equal("p1", p!.Id);
         Assert.Equal("Site", p.Name);

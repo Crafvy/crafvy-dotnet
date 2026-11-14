@@ -10,7 +10,7 @@ namespace Crafvy;
 public static class Operations
 {
     /// <summary>The version of the API description this SDK was generated from.</summary>
-    public const string ApiVersion = "0.3.0";
+    public const string ApiVersion = "0.3.1";
 
     /// <summary>Every operation.</summary>
     public static readonly IReadOnlyList<Operation> All = new[]
